@@ -60,6 +60,7 @@
 #include "datum_api.h"
 #include "datum_coinbaser.h"
 #include "datum_protocol.h"
+#include "datum_hook.h"
 
 const char *datum_gateway_config_filename = NULL;
 
@@ -178,7 +179,10 @@ int main(const int argc, const char * const * const argv) {
 		exit(1);
 	}
 	datum_gateway_config_filename = arguments.config_file;
-	
+
+	hook_init();
+	// do_test();
+
 	// Initialize logger thread
 	datum_logger_init();
 	
