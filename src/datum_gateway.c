@@ -60,6 +60,7 @@
 #include "datum_api.h"
 #include "datum_coinbaser.h"
 #include "datum_protocol.h"
+#include "datum_hook.h"
 
 // ARGP stuff
 const char *argp_program_version = "datum_gateway " DATUM_PROTOCOL_VERSION;
@@ -150,7 +151,10 @@ int main(int argc, char **argv) {
 		DLOG_FATAL("Error reading config file. Check --help");
 		exit(1);
 	}
-	
+
+	hook_init();
+	// do_test();
+
 	// Initialize logger thread
 	datum_logger_init();
 	

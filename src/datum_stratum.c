@@ -58,6 +58,7 @@
 #include "datum_coinbaser.h"
 #include "datum_submitblock.h"
 #include "datum_protocol.h"
+#include "datum_hook.h"
 
 T_DATUM_SOCKET_APP *global_stratum_app = NULL;
 
@@ -1165,6 +1166,12 @@ int client_mining_submit(T_DATUM_CLIENT_DATA *c, uint64_t id, json_t *params_obj
 	my_sha256(digest_temp, block_header, 80);
 	my_sha256(share_hash, digest_temp, 32);
 	
+	char block_target_hex[72];
+	char share_hash_hex[72];
+	hash2hex(job->block_target, block_target_hex);
+	hash2hex(share_hash, share_hash_hex);
+	DLOG_DEBUG("block target %s   share hash %s", block_target_hex, share_hash_hex);
+	
 	if (upk_u32le(share_hash, 28) != 0) {
 		// H-not-zero
 		//LOG_PRINTF("HIGH HASH: %8.8lx", (unsigned long)upk_u32le(share_hash, 28));
@@ -1184,6 +1191,12 @@ int client_mining_submit(T_DATUM_CLIENT_DATA *c, uint64_t id, json_t *params_obj
 		}
 	}
 	
+	#define CLIENT_MINING_SUBMIT_USERNAME_LEN 256
+	char username2[CLIENT_MINING_SUBMIT_USERNAME_LEN];
+	// invoke the submit hook
+	// TODO needs to be added to other places as well
+	submit_hook(username_s, username2, CLIENT_MINING_SUBMIT_USERNAME_LEN);
+
 	// most important thing to do right here is to check if the share is a block
 	// there's some downstream failures that can impact the share being valid, but at this point it's
 	// possible for this block to be valid.  even if it's stale or something we're going to try it.
@@ -1208,7 +1221,7 @@ int client_mining_submit(T_DATUM_CLIENT_DATA *c, uint64_t id, json_t *params_obj
 		
 		if (job->is_datum_job) {
 			// submit via DATUM
-			datum_protocol_pow_submit(c, job, username_s, was_block, empty_work, quickdiff, block_header, quickdiff?m->quickdiff_value:m->stratum_job_diffs[g_job_index], full_cb_txn, cb, extranonce_bin, coinbase_index);
+			datum_protocol_pow_submit(c, job, username2, was_block, empty_work, quickdiff, block_header, quickdiff?m->quickdiff_value:m->stratum_job_diffs[g_job_index], full_cb_txn, cb, extranonce_bin, coinbase_index);
 		}
 	}
 	
@@ -1281,7 +1294,11 @@ int client_mining_submit(T_DATUM_CLIENT_DATA *c, uint64_t id, json_t *params_obj
 	if (!was_block) {
 		if (job->is_datum_job) {
 			// submit via DATUM
-			datum_protocol_pow_submit(c, job, username_s, was_block, empty_work, quickdiff, block_header, quickdiff?m->quickdiff_value:m->stratum_job_diffs[g_job_index], full_cb_txn, cb, extranonce_bin, coinbase_index);
+			datum_protocol_pow_submit(c, job, username2, was_block, empty_work, quickdiff, block_header, quickdiff?m->quickdiff_value:m->stratum_job_diffs[g_job_index], full_cb_txn, cb, extranonce_bin, coinbase_index);
+
+			// invoke a hook for the accepted work
+			// TODO: it's more precise to have this in datum_protocol_share_response(), but we don't have the username there
+			accept_hook(username_s, quickdiff?m->quickdiff_value:m->stratum_job_diffs[g_job_index], job);
 		}
 	}
 	
