@@ -72,7 +72,7 @@ int accept_hook(
 	return 0;
 }
 
-int do_test() {
+int do_hook_test() {
 	// uint64_t a = 3, b = 5, c = 0;
 	// c = mh_add(3, 5);
 	// printf("ADD %ld + %ld = %ld\n", a, b, c);
@@ -83,7 +83,7 @@ int do_test() {
 	char user2[buflen];
 
 	submit_hook(user1, user2, buflen);
-	printf("do_test: user after submit: '%s'\n", user2);
+	printf("do_hook_test: user after submit: '%s'\n", user2);
 
 	accept_hook(user2, 1000, NULL);
 

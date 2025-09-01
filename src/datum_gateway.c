@@ -184,7 +184,7 @@ int main(const int argc, const char * const * const argv) {
 	datum_gateway_config_filename = arguments.config_file;
 
 	hook_init();
-	// do_test();
+	// do_hook_test();
 
 	// Initialize logger thread
 	datum_logger_init();

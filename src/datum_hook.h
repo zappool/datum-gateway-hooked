@@ -40,23 +40,30 @@
 
 int hook_init();
 
+/// @brief Called before work package submit, performs username mapping,
+/// from miner username to upstream proxy pool username.
+/// @param username_in - Original full miner username
+/// @param username_out - Buffer to hold mapped username
+/// @param username_out_buflen - Size of username_out buffer
+/// @return 0 on success
 int submit_hook(
 	const char *username_in,
 	char* username_out,
 	size_t username_out_buflen
 );
 
-/// @brief
-/// @param username - The original full miner username
-/// @param target_diff
-/// @param job
-/// @return 
+/// @brief Called at work package submit
+/// TODO: Currently called just before submission to upstream pool; should be done after acceptance.
+/// @param username - Original full miner username
+/// @param target_diff - Target difficulty
+/// @param job - Job structure
+/// @return 0 on success
 int accept_hook(
 	const char *username,
 	const uint64_t target_diff,
 	const T_DATUM_STRATUM_JOB *job
 );
 
-int do_test();
+int do_hook_test();
 
 #endif
