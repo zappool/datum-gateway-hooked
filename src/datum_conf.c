@@ -190,6 +190,10 @@ const T_DATUM_CONFIG_ITEM datum_config_options[] = {
 		.required = false, .ptr = &datum_config.datum_pooled_mining_only, 	.default_bool = true },
 	{ .var_type = DATUM_CONF_INT, 		.category = "datum", 		.name = "protocol_global_timeout",		.description = "If no valid messages are received from the DATUM server in this many seconds, give up and try to reconnect",
 		.required = false, .ptr = &datum_config.datum_protocol_global_timeout, 	.default_int = 60 },
+
+	// proxypool options ("hooked")
+	{ .var_type = DATUM_CONF_STRING, 	.category = "proxypool", 		.name = "upstream_username",		.description = "The username of the proxypool at the upstream pool", .example_default = true,
+		.required = true, .ptr = &datum_config.proxypool_us_username, 	.default_string[0] = "bc1xxxsomething", .max_string_len = sizeof(datum_config.proxypool_us_username) }
 };
 
 #define NUM_CONFIG_ITEMS (sizeof(datum_config_options) / sizeof(datum_config_options[0]))

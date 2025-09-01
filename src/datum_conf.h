@@ -166,6 +166,8 @@ typedef struct {
 	int override_mining_pool_scriptsig_len;
 	char override_mining_coinbase_tag_primary[256];
 	uint64_t override_vardiff_min;
+
+	char proxypool_us_username[256];
 } global_config_t;
 
 extern global_config_t datum_config;
