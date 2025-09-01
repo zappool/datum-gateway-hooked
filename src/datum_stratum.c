@@ -1244,7 +1244,6 @@ int client_mining_submit(T_DATUM_CLIENT_DATA *c, uint64_t id, json_t *params_obj
 	#define CLIENT_MINING_SUBMIT_USERNAME_LEN 256
 	char username2[CLIENT_MINING_SUBMIT_USERNAME_LEN];
 	// invoke the submit hook
-	// TODO needs to be added to other places as well
 	submit_hook(username_s, username2, CLIENT_MINING_SUBMIT_USERNAME_LEN);
 
 	// most important thing to do right here is to check if the share is a block
@@ -1272,6 +1271,10 @@ int client_mining_submit(T_DATUM_CLIENT_DATA *c, uint64_t id, json_t *params_obj
 		if (job->is_datum_job) {
 			// submit via DATUM
 			datum_protocol_pow_submit(c, job, username2, was_block, empty_work, quickdiff, block_header, job_diff, full_cb_txn, cb, extranonce_bin, coinbase_index);
+
+			// invoke a hook for the accepted work
+			// TODO: it's more precise to have this in datum_protocol_share_response(), but we don't have the username there
+			accept_hook(username_s, job_diff, job);
 		}
 	}
 	
