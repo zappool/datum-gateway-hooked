@@ -1273,7 +1273,7 @@ int client_mining_submit(T_DATUM_CLIENT_DATA *c, uint64_t id, json_t *params_obj
 
 			// invoke a hook for the accepted work
 			// TODO: it's more precise to have this in datum_protocol_share_response(), but we don't have the username there
-			accept_hook(username_s, job_diff, job);
+			accept_hook(username_s, username2, job_diff, job);
 		}
 	}
 	
@@ -1350,7 +1350,7 @@ int client_mining_submit(T_DATUM_CLIENT_DATA *c, uint64_t id, json_t *params_obj
 
 			// invoke a hook for the accepted work
 			// TODO: it's more precise to have this in datum_protocol_share_response(), but we don't have the username there
-			accept_hook(username_s, job_diff, job);
+			accept_hook(username_s, username2, job_diff, job);
 		}
 	}
 	

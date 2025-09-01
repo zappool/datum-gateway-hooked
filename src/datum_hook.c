@@ -93,11 +93,12 @@ int submit_hook(
 }
 
 int accept_hook(
-	const char *username,
+	const char *username_orig,
+	const char *username_upstream,
 	const uint64_t target_diff,
-	const T_DATUM_STRATUM_JOB *job
+	const T_DATUM_STRATUM_JOB *_job
 ) {
-	printf("datum_hook: accept_hook user '%s'  tdiff %ld \n", username, target_diff);
+	printf("datum_hook: accept_hook user '%s' '%s'  tdiff %ld \n", username_orig, username_upstream, target_diff);
 
 	return 0;
 }
@@ -114,7 +115,7 @@ int do_hook_test() {
 	submit_hook(user1, user2, sizeof(user2));
 	printf("do_hook_test: user after submit: '%s'\n", user2);
 
-	accept_hook(user2, 1000, NULL);
+	accept_hook(user1, user2, 1000, NULL);
 
 	return 0;
 }
