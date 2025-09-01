@@ -54,12 +54,14 @@ int submit_hook(
 
 /// @brief Called at work package submit
 /// TODO: Currently called just before submission to upstream pool; should be done after acceptance.
-/// @param username - Original full miner username
+/// @param username_orig - Original full miner username
+/// @param username_upstream - Upstream full username (proxypool username + derived worker)
 /// @param target_diff - Target difficulty
 /// @param job - Job structure
 /// @return 0 on success
 int accept_hook(
-	const char *username,
+	const char *username_orig,
+	const char *username_upstream,
 	const uint64_t target_diff,
 	const T_DATUM_STRATUM_JOB *job
 );
