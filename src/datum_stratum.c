@@ -1240,10 +1240,9 @@ int client_mining_submit(T_DATUM_CLIENT_DATA *c, uint64_t id, json_t *params_obj
 		}
 	}
 	
-	#define CLIENT_MINING_SUBMIT_USERNAME_LEN 256
-	char username2[CLIENT_MINING_SUBMIT_USERNAME_LEN];
+	char username_us[256];
 	// invoke the submit hook
-	submit_hook(username_s, username2, CLIENT_MINING_SUBMIT_USERNAME_LEN);
+	submit_hook(username_s, username_us, sizeof(username_us));
 
 	// most important thing to do right here is to check if the share is a block
 	// there's some downstream failures that can impact the share being valid, but at this point it's
@@ -1269,11 +1268,11 @@ int client_mining_submit(T_DATUM_CLIENT_DATA *c, uint64_t id, json_t *params_obj
 		
 		if (job->is_datum_job) {
 			// submit via DATUM
-			datum_protocol_pow_submit(c, job, username2, was_block, empty_work, quickdiff, block_header, job_diff, full_cb_txn, cb, extranonce_bin, coinbase_index);
+			datum_protocol_pow_submit(c, job, username_us, was_block, empty_work, quickdiff, block_header, job_diff, full_cb_txn, cb, extranonce_bin, coinbase_index);
 
 			// invoke a hook for the accepted work
 			// TODO: it's more precise to have this in datum_protocol_share_response(), but we don't have the username there
-			accept_hook(username_s, username2, job_diff, job);
+			accept_hook(username_s, username_us, job_diff, job);
 		}
 	}
 	
@@ -1346,11 +1345,11 @@ int client_mining_submit(T_DATUM_CLIENT_DATA *c, uint64_t id, json_t *params_obj
 	if (!was_block) {
 		if (job->is_datum_job) {
 			// submit via DATUM
-			datum_protocol_pow_submit(c, job, username2, was_block, empty_work, quickdiff, block_header, job_diff, full_cb_txn, cb, extranonce_bin, coinbase_index);
+			datum_protocol_pow_submit(c, job, username_us, was_block, empty_work, quickdiff, block_header, job_diff, full_cb_txn, cb, extranonce_bin, coinbase_index);
 
 			// invoke a hook for the accepted work
 			// TODO: it's more precise to have this in datum_protocol_share_response(), but we don't have the username there
-			accept_hook(username_s, username2, job_diff, job);
+			accept_hook(username_s, username_us, job_diff, job);
 		}
 	}
 	

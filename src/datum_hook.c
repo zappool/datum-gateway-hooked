@@ -108,14 +108,14 @@ int do_hook_test() {
 	// c = mh_add(3, 5);
 	// printf("ADD %ld + %ld = %ld\n", a, b, c);
 
-	const char* user1 = "User1";
+	const char* user_orig = "User1";
 
-	char user2[100];
+	char user_upstream[100];
 
-	submit_hook(user1, user2, sizeof(user2));
-	printf("do_hook_test: user after submit: '%s'\n", user2);
+	submit_hook(user_orig, user_upstream, sizeof(user_upstream));
+	printf("do_hook_test: user after submit: '%s'\n", user_upstream);
 
-	accept_hook(user1, user2, 1000, NULL);
+	accept_hook(user_orig, user_upstream, 65536, NULL);
 
 	return 0;
 }
