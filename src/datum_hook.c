@@ -50,6 +50,8 @@
 #include "datum_hook.h"
 
 int hook_init() {
+	printf("datum_hook: hook_init \n");
+	return 0;
 }
 
 int submit_hook(
