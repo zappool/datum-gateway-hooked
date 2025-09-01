@@ -49,6 +49,12 @@
 
 #include "datum_hook.h"
 
+#include "datum_conf.h"
+#include "datum_utils.h"
+
+
+#define WORKER_HASH_LEN 8
+
 int hook_init() {
 	printf("datum_hook: hook_init \n");
 	return 0;
@@ -59,7 +65,29 @@ int submit_hook(
 	char* username_out,
 	size_t username_out_buflen
 ) {
-	strncpy(username_out, username_in, username_out_buflen);
+	// Upstream username: from config
+	const char* us_username = datum_config.proxypool_us_username;
+
+	// Upstream worker: hashed from full original username (incl. worker)
+	bool res;
+	unsigned char hash[32];
+	if (!my_sha256((void*)hash, (const void*)username_in, strlen(username_in))) {
+		printf("datum_hook: submit_hook: Error in hashing %d \n", res);
+		return -1;
+	}
+	char hashstr[65];
+	hash2hex(hash, hashstr);
+	// printf("hashstr %s \n", hashstr);
+	// crop it
+	hashstr[WORKER_HASH_LEN] = 0;
+	// printf("hashstr %s \n", hashstr);
+
+	// Concatenate
+	char us_username_full[512];
+	snprintf(us_username_full, sizeof(us_username_full), "%s.%s", us_username, hashstr);
+	// printf("us_username_full %s \n", us_username_full);
+
+	strncpy(username_out, us_username_full, username_out_buflen);
 	printf("datum_hook: submit_hook user_in: '%s' user_out: '%s' \n", username_in, username_out);
 	return 0;
 }
@@ -81,10 +109,9 @@ int do_hook_test() {
 
 	const char* user1 = "User1";
 
-	const uint32_t buflen = 100;
-	char user2[buflen];
+	char user2[100];
 
-	submit_hook(user1, user2, buflen);
+	submit_hook(user1, user2, sizeof(user2));
 	printf("do_hook_test: user after submit: '%s'\n", user2);
 
 	accept_hook(user2, 1000, NULL);
