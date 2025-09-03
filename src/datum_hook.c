@@ -64,9 +64,6 @@ size_t http_write_callback(void *contents, size_t size, size_t nmemb, char *buf,
 	return total_size;
 }
 
-// The URL to the Workstat server's endpoint
-#define WORKSTAT_API_URL "http://localhost:5000/api/work-insert"
-
 int submit_work_workstat(const char *username_orig, const char *username_upstream, uint64_t target_diff) {
 	// Initialize libcurl
 	CURL* curl = curl_easy_init();
@@ -84,7 +81,7 @@ int submit_work_workstat(const char *username_orig, const char *username_upstrea
 	char response_data[1000];
 
 	// Set libcurl options
-	curl_easy_setopt(curl, CURLOPT_URL, WORKSTAT_API_URL);
+	curl_easy_setopt(curl, CURLOPT_URL, datum_config.workstat_api_insert_url);
 	curl_easy_setopt(curl, CURLOPT_POST, 1L);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_payload);
 
@@ -98,8 +95,8 @@ int submit_work_workstat(const char *username_orig, const char *username_upstrea
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_data);
 
 	// Perform the request
-	printf("Sending POST request to %s \n", WORKSTAT_API_URL);
-	printf("Payload: %s \n", json_payload);
+	// printf("Sending POST request to %s \n", datum_config.workstat_api_insert_url);
+	// printf("Payload: %s \n", json_payload);
 
 	CURLcode res = curl_easy_perform(curl);
 
@@ -112,7 +109,11 @@ int submit_work_workstat(const char *username_orig, const char *username_upstrea
 		long http_code = 0;
 		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
 
-		printf("HTTP Response Code: %ld \n", http_code);
+		// printf("HTTP Response Code: %ld \n", http_code);
+		if (!((http_code == 200) || (http_code == 201))) {
+			fprintf(stderr, "Error response code: %ld \n", http_code);
+			return -3;
+		}
 		printf("Response: %s \n", response_data);
 	}
 
@@ -182,7 +183,7 @@ int do_hook_test() {
 	// c = mh_add(3, 5);
 	// printf("ADD %ld + %ld = %ld\n", a, b, c);
 
-	const char* user_orig = "User1";
+	const char* user_orig = "lnaddress1dummy.bitaxe";
 
 	char user_upstream[100];
 
