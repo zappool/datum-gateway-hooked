@@ -167,6 +167,7 @@ typedef struct {
 	uint64_t override_vardiff_min;
 
 	char proxypool_us_username[256];
+	char workstat_api_insert_url[1024];
 } global_config_t;
 
 extern global_config_t datum_config;
