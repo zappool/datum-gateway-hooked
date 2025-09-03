@@ -57,11 +57,72 @@
 
 #define WORKER_HASH_LEN 8
 
+// Size for http response write buffer
+#define HTTP_RESPONSE_BUFFER_SIZE 10000
+
 // Callback function to handle response data
 size_t http_write_callback(void *contents, size_t size, size_t nmemb, char *buf, size_t bufsize) {
 	size_t total_size = size * nmemb;
-	strncat(buf, (char*)contents, bufsize);
+	size_t remain_buf_size;
+	remain_buf_size = HTTP_RESPONSE_BUFFER_SIZE - strlen(buf);
+	strncat(buf, (const char*)contents, remain_buf_size);
 	return total_size;
+}
+
+int ping_workstat() {
+	// Initialize libcurl
+	CURL* curl = curl_easy_init();
+
+	if (!curl) {
+		fprintf(stderr, "Error: Failed to initialize libcurl\n");
+		return -1;
+	}
+
+	// Store the response
+	char response_data[HTTP_RESPONSE_BUFFER_SIZE];
+	response_data[0] = 0;
+
+	char url[1500];
+	snprintf(url, sizeof(url), "%sping", datum_config.workstat_api_url);
+
+	// Set libcurl options
+	curl_easy_setopt(curl, CURLOPT_URL, url);
+	// curl_easy_setopt(curl, CURLOPT_POST, 1L);
+
+	// Set headers
+	struct curl_slist* headers = NULL;
+	headers = curl_slist_append(headers, "Content-Type: application/json");
+	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+	// Set the write callback function
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, http_write_callback);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_data);
+
+	// Perform the request
+	CURLcode res = curl_easy_perform(curl);
+
+	// Check for errors
+	if (res != CURLE_OK) {
+		fprintf(stderr, "Error: %s \n", curl_easy_strerror(res));
+		return -2;
+	} else {
+		// Get HTTP response code
+		long http_code = 0;
+		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+
+		// printf("HTTP Response Code: %ld \n", http_code);
+		if (http_code != 200) {
+			fprintf(stderr, "Error response code: %ld \n", http_code);
+			return -3;
+		}
+		// printf("Response: %s \n", response_data);
+	}
+
+	// Clean up
+	curl_slist_free_all(headers);
+	curl_easy_cleanup(curl);
+
+	return 0;
 }
 
 int submit_work_workstat(const char *username_orig, const char *username_upstream, uint64_t target_diff) {
@@ -78,10 +139,14 @@ int submit_work_workstat(const char *username_orig, const char *username_upstrea
 	snprintf(json_payload, sizeof(json_payload), "{\"uname_o\": \"%s\", \"uname_u\": \"%s\", \"tdiff\": %ld}", username_orig, username_upstream, target_diff);
 
 	// Store the response
-	char response_data[1000];
+	char response_data[HTTP_RESPONSE_BUFFER_SIZE];
+	response_data[0] = 0;
+
+	char url[1500];
+	snprintf(url, sizeof(url), "%swork-insert", datum_config.workstat_api_url);
 
 	// Set libcurl options
-	curl_easy_setopt(curl, CURLOPT_URL, datum_config.workstat_api_insert_url);
+	curl_easy_setopt(curl, CURLOPT_URL, url);
 	curl_easy_setopt(curl, CURLOPT_POST, 1L);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_payload);
 
@@ -95,7 +160,7 @@ int submit_work_workstat(const char *username_orig, const char *username_upstrea
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_data);
 
 	// Perform the request
-	// printf("Sending POST request to %s \n", datum_config.workstat_api_insert_url);
+	// printf("Sending POST request to %s \n", url);
 	// printf("Payload: %s \n", json_payload);
 
 	CURLcode res = curl_easy_perform(curl);
@@ -126,6 +191,16 @@ int submit_work_workstat(const char *username_orig, const char *username_upstrea
 
 int hook_init() {
 	printf("datum_hook: hook_init \n");
+
+	int ping_workstat_res;
+	ping_workstat_res = ping_workstat();
+	if (ping_workstat_res) {
+		fprintf(stderr, "Error pinging workstat API: %d \n", ping_workstat_res);
+		return ping_workstat_res;
+	}
+
+	printf("datum_hook: hook_init OK \n");
+
 	return 0;
 }
 
