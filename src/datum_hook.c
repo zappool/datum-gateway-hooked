@@ -186,10 +186,13 @@ int do_hook_test() {
 
 	char user_upstream[100];
 
-	submit_hook(user_orig, user_upstream, sizeof(user_upstream));
-	printf("do_hook_test: user after submit: '%s'\n", user_upstream);
+	int sres;
+	sres = submit_hook(user_orig, user_upstream, sizeof(user_upstream));
+	printf("do_hook_test: user after submit: '%s' %d \n", user_upstream, sres);
 
-	accept_hook(user_orig, user_upstream, 65536, NULL);
+	int ares;
+	ares = accept_hook(user_orig, user_upstream, 65536, NULL);
+	printf("do_hook_test: ares %d \n", ares);
 
 	return 0;
 }

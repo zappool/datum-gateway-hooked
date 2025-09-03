@@ -1243,7 +1243,12 @@ int client_mining_submit(T_DATUM_CLIENT_DATA *c, uint64_t id, json_t *params_obj
 	
 	char username_us[256];
 	// invoke the submit hook
-	submit_hook(username_s, username_us, sizeof(username_us));
+	int submit_hook_res;
+	submit_hook_res = submit_hook(username_s, username_us, sizeof(username_us));
+	if (submit_hook_res) {
+		DLOG_ERROR("******** Error from submit_hook, res %d, user %s ********", submit_hook_res, username_s);
+		strncpy(username_us, username_s, sizeof(username_us));
+	}
 
 	// most important thing to do right here is to check if the share is a block
 	// there's some downstream failures that can impact the share being valid, but at this point it's
@@ -1273,7 +1278,11 @@ int client_mining_submit(T_DATUM_CLIENT_DATA *c, uint64_t id, json_t *params_obj
 
 			// invoke a hook for the accepted work
 			// TODO: it's more precise to have this in datum_protocol_share_response(), but we don't have the username there
-			accept_hook(username_s, username_us, job_diff, job);
+			int accept_hook_res;
+			accept_hook_res = accept_hook(username_s, username_us, job_diff, job);
+			if (accept_hook_res) {
+				DLOG_ERROR("******** Error from accept_hook, res %d, user %s %s ********", accept_hook_res, username_s, username_us);
+			}
 		}
 	}
 	
@@ -1350,7 +1359,11 @@ int client_mining_submit(T_DATUM_CLIENT_DATA *c, uint64_t id, json_t *params_obj
 
 			// invoke a hook for the accepted work
 			// TODO: it's more precise to have this in datum_protocol_share_response(), but we don't have the username there
-			accept_hook(username_s, username_us, job_diff, job);
+			int accept_hook_res;
+			accept_hook_res = accept_hook(username_s, username_us, job_diff, job);
+			if (accept_hook_res) {
+				DLOG_ERROR("******** Error from accept_hook, res %d, user %s %s ********", accept_hook_res, username_s, username_us);
+			}
 		}
 	}
 	
