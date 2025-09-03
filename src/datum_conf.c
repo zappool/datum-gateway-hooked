@@ -194,8 +194,8 @@ const T_DATUM_CONFIG_ITEM datum_config_options[] = {
 	// proxypool options ("hooked")
 	{ .var_type = DATUM_CONF_STRING, 	.category = "proxypool", 		.name = "upstream_username",		.description = "The username of the proxypool at the upstream pool", .example_default = true,
 		.required = true, .ptr = &datum_config.proxypool_us_username, 	.default_string[0] = "bc1xxxsomething", .max_string_len = sizeof(datum_config.proxypool_us_username) },
-	{ .var_type = DATUM_CONF_STRING, 	.category = "proxypool", 		.name = "workstat_api_insert_url",		.description = "Workstat server Insert API URL", .example_default = true,
-		.required = true, .ptr = &datum_config.workstat_api_insert_url, 	.default_string[0] = "http://localhost:5000/api/work-insert", .max_string_len = sizeof(datum_config.workstat_api_insert_url) }
+	{ .var_type = DATUM_CONF_STRING, 	.category = "proxypool", 		.name = "workstat_api_url",		.description = "Workstat server API URL", .example_default = true,
+		.required = true, .ptr = &datum_config.workstat_api_url, 	.default_string[0] = "http://localhost:5000/api/", .max_string_len = sizeof(datum_config.workstat_api_url) }
 };
 
 #define NUM_CONFIG_ITEMS (sizeof(datum_config_options) / sizeof(datum_config_options[0]))
