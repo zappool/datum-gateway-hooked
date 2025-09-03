@@ -104,6 +104,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
 			exit(0);
 			break;
 		case 0x101:  // test
+			// do_hook_test();
 			datum_utils_tests();
 			datum_conf_tests();
 			datum_stratum_tests();

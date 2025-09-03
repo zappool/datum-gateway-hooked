@@ -35,25 +35,93 @@
 
 // This is quick and dirty for now.  Will be improved over time.
 
-#include <assert.h>
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <microhttpd.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <pthread.h>
-#include <inttypes.h>
-#include <jansson.h>
+// #include <assert.h>
+// #include <limits.h>
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <microhttpd.h>
+// #include <arpa/inet.h>
+// #include <netinet/in.h>
+// #include <pthread.h>
+// #include <inttypes.h>
+// #include <jansson.h>
 
 #include "datum_hook.h"
 
 #include "datum_conf.h"
 #include "datum_utils.h"
 
+#include <string.h>
+#include <curl/curl.h>
+
 
 #define WORKER_HASH_LEN 8
+
+// Callback function to handle response data
+size_t http_write_callback(void *contents, size_t size, size_t nmemb, char *buf, size_t bufsize) {
+	size_t total_size = size * nmemb;
+	strncat(buf, (char*)contents, bufsize);
+	return total_size;
+}
+
+// The URL to the Workstat server's endpoint
+#define WORKSTAT_API_URL "http://localhost:5000/api/work-insert"
+
+int submit_work_workstat(const char *username_orig, const char *username_upstream, uint64_t target_diff) {
+	// Initialize libcurl
+	CURL* curl = curl_easy_init();
+
+	if (!curl) {
+		fprintf(stderr, "Error: Failed to initialize libcurl\n");
+		return -1;
+	}
+
+	// Create the JSON payload
+	char json_payload[1000];
+	snprintf(json_payload, sizeof(json_payload), "{\"uname_o\": \"%s\", \"uname_u\": \"%s\", \"tdiff\": %ld}", username_orig, username_upstream, target_diff);
+
+	// Store the response
+	char response_data[1000];
+
+	// Set libcurl options
+	curl_easy_setopt(curl, CURLOPT_URL, WORKSTAT_API_URL);
+	curl_easy_setopt(curl, CURLOPT_POST, 1L);
+	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_payload);
+
+	// Set headers
+	struct curl_slist* headers = NULL;
+	headers = curl_slist_append(headers, "Content-Type: application/json");
+	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+	// Set the write callback function
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, http_write_callback);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_data);
+
+	// Perform the request
+	printf("Sending POST request to %s \n", WORKSTAT_API_URL);
+	printf("Payload: %s \n", json_payload);
+
+	CURLcode res = curl_easy_perform(curl);
+
+	// Check for errors
+	if (res != CURLE_OK) {
+		fprintf(stderr, "Error: %s \n", curl_easy_strerror(res));
+		return -2;
+	} else {
+		// Get HTTP response code
+		long http_code = 0;
+		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+
+		printf("HTTP Response Code: %ld \n", http_code);
+		printf("Response: %s \n", response_data);
+	}
+
+	// Clean up
+	curl_slist_free_all(headers);
+	curl_easy_cleanup(curl);
+
+	return 0;
+}
 
 int hook_init() {
 	printf("datum_hook: hook_init \n");
@@ -99,6 +167,12 @@ int accept_hook(
 	const T_DATUM_STRATUM_JOB *_job
 ) {
 	printf("datum_hook: accept_hook user '%s' '%s'  tdiff %ld \n", username_orig, username_upstream, target_diff);
+
+	int res;
+	res = submit_work_workstat(username_orig, username_upstream, target_diff);
+	if (!res) {
+		return res;
+	}
 
 	return 0;
 }
