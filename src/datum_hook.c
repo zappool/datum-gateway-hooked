@@ -213,10 +213,9 @@ int submit_hook(
 	const char* us_username = datum_config.proxypool_us_username;
 
 	// Upstream worker: hashed from full original username (incl. worker)
-	bool res;
 	unsigned char hash[32];
 	if (!my_sha256((void*)hash, (const void*)username_in, strlen(username_in))) {
-		printf("datum_hook: submit_hook: Error in hashing %d \n", res);
+		printf("datum_hook: submit_hook: Error in hashing \n");
 		return -1;
 	}
 	char hashstr[65];
