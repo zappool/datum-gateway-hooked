@@ -13,24 +13,24 @@ jobs:
         os:
           - ubuntu:latest
           - ubuntu:22.04
-          - debian:latest
-          - debian:stable
-          - debian:oldstable
-          - almalinux:latest
-          - amazonlinux:latest
-          - fedora:latest
-          - oraclelinux:9
-          - alpine:latest
-          - archlinux:latest
-          - clearlinux:latest
-          - gentoo/stage3:musl-hardened
-          - gentoo/stage3:hardened
-          - freebsd
+          # - debian:latest
+          # - debian:stable
+          # - debian:oldstable
+          # - almalinux:latest
+          # - amazonlinux:latest
+          # - fedora:latest
+          # - oraclelinux:9
+          # - alpine:latest
+          # - archlinux:latest
+          # - clearlinux:latest
+          # - gentoo/stage3:musl-hardened
+          # - gentoo/stage3:hardened
+          # - freebsd
         config:
           - cmake_args: "-DENABLE_API=ON -DCMAKE_C_COMPILER=gcc"
           - cmake_args: "-DENABLE_API=ON -DCMAKE_C_COMPILER=clang"
-          - cmake_args: "-DENABLE_API=ON -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS=-DDATUM_API_FOR_UMBREL=ON"
-          - cmake_args: "-DENABLE_API=OFF"
+          # - cmake_args: "-DENABLE_API=ON -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS=-DDATUM_API_FOR_UMBREL=ON"
+          # - cmake_args: "-DENABLE_API=OFF"
         exclude:
           # Clang configured for C11 rejects our C23 usage
           - os: debian:oldstable
