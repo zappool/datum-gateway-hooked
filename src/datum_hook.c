@@ -136,7 +136,8 @@ int submit_work_workstat(const char *username_orig, const char *username_upstrea
 
 	// Create the JSON payload
 	char json_payload[1000];
-	snprintf(json_payload, sizeof(json_payload), "{\"uname_o\": \"%s\", \"uname_u\": \"%s\", \"tdiff\": %ld}", username_orig, username_upstream, target_diff);
+	snprintf(json_payload, sizeof(json_payload), "{\"uname_o\": \"%s\", \"uname_u\": \"%s\", \"tdiff\": %ld, \"sec\": \"%s\"}",
+		username_orig, username_upstream, target_diff, datum_config.workstat_secret);
 
 	// Store the response
 	char response_data[HTTP_RESPONSE_BUFFER_SIZE];

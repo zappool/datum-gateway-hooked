@@ -169,6 +169,7 @@ typedef struct {
 
 	char proxypool_us_username[256];
 	char workstat_api_url[1024];
+	char workstat_secret[256];
 } global_config_t;
 
 extern global_config_t datum_config;
