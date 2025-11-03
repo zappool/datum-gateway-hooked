@@ -13,7 +13,8 @@ Prototype, work-in-progress.
 ```
 	"proxypool": {
 		"upstream_username": "bc1xxxsomething",
-		"workstat_api_url": "http://localhost:5000/api/"
+		"workstat_api_url": "http://localhost:5000/api/",
+		"workstat_secret": "secret_value"
 	}
 ```
 
@@ -46,9 +47,10 @@ Example:
 
 ```json
   {
-    "uname_o": "npub12gygh77v0ux4xk73vvht34lf3g8hs3vfsdjs823ts6pce9n28ehq8edvt8",
-    "uname_u": "bc1q98wufxmtfh5qlk7fe5dzy2z8cflvqjysrh4fx2",
-    "tdiff": 131072
+	"uname_o": "npub12gygh77v0ux4xk73vvht34lf3g8hs3vfsdjs823ts6pce9n28ehq8edvt8",
+	"uname_u": "bc1q98wufxmtfh5qlk7fe5dzy2z8cflvqjysrh4fx2",
+	"tdiff": 131072,
+	"sec": "secret_value"
   }
 ```
 
