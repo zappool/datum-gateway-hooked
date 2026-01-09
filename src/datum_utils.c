@@ -10,7 +10,7 @@
  *
  * ---
  *
- * Copyright (c) 2024 Bitcoin Ocean, LLC & Jason Hughes
+ * Copyright (c) 2024-2025 Bitcoin Ocean, LLC & Jason Hughes
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -164,15 +164,17 @@ uint64_t current_time_micros(void) {
 unsigned char hex_lookup[65536];
 unsigned short uchar_hex_lookup[256];
 
-// crappy function written by wizkid057! v2! :D
 unsigned char hex2bin_uchar(const char *in) {
-	return hex_lookup[*(const unsigned short *)in];
+	unsigned short i;
+	memcpy(&i, in, sizeof(i));
+	return hex_lookup[i];
 }
 
 void uchar_to_hex(char *s, const unsigned char b) {
 	// place the ASCII hexidecimal value for the unsigned char into the string at ptr s
 	// this does NOT null terminate the string!
-	*(unsigned short *)s = uchar_hex_lookup[b];
+	unsigned short i = uchar_hex_lookup[b];
+	memcpy(s, &i, sizeof(i));
 }
 
 void build_hex_lookup(void) {
@@ -183,10 +185,10 @@ void build_hex_lookup(void) {
 	hex_lookup[65535] = 0;
 	for(i=0;i<256;i++) {
 		sprintf(a,"%2.2X",i);
-		b = *(unsigned short *)&a;
+		memcpy(&b, a, sizeof(b));
 		hex_lookup[b] = i;
 		sprintf(a,"%2.2x",i);
-		b = *(unsigned short *)&a;
+		memcpy(&b, a, sizeof(b));
 		hex_lookup[b] = i;
 		uchar_hex_lookup[i] = b;
 	}
@@ -826,6 +828,7 @@ void datum_reexec() {
 }
 
 bool datum_secure_strequals(const char *secret, size_t secret_len, const char *guess) {
+	if (!guess) return false;
 	const size_t guess_len = strlen(guess);
 	size_t acc = secret_len ^ guess_len;
 	if (!secret_len) {

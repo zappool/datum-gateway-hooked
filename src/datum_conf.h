@@ -10,7 +10,7 @@
  *
  * ---
  *
- * Copyright (c) 2024 Bitcoin Ocean, LLC & Jason Hughes
+ * Copyright (c) 2024-2025 Bitcoin Ocean, LLC & Jason Hughes
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -135,6 +135,7 @@ typedef struct {
 	char api_csrf_token[65];
 	char api_listen_addr[128];
 	int api_listen_port;
+	bool api_allow_insecure_auth;
 	bool api_modify_conf;
 	json_t *config_json;
 	

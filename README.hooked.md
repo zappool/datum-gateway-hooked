@@ -59,5 +59,5 @@ See https://github.com/zappool/zappool-backend/tree/main/workstat for an impleme
 
 ## To generate diff file:
 
-git diff <commit>
+git diff <baseline_commit>
 git diff cd7b7a3

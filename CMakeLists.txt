@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 
-project(DATUM VERSION 0.3.2 LANGUAGES C)
+project(DATUM VERSION 0.4.1 LANGUAGES C)
 
 # Enable C23 if supported, else fall back to C11 for compatibility
 if(CMAKE_VERSION VERSION_LESS "3.21")
@@ -162,7 +162,7 @@ endif()
 
 install(FILES README.md DESTINATION ${CMAKE_INSTALL_DOCDIR})
 install(FILES doc/DATUM_recommended_setup-network_diagram.svg DESTINATION ${CMAKE_INSTALL_DOCDIR}/doc)
-install(FILES doc/usernames.md DESTINATION ${CMAKE_INSTALL_DOCDIR})
+install(FILES doc/usernames.md DESTINATION ${CMAKE_INSTALL_DOCDIR}/doc)
 
 set(PREGEN_DOC ${CMAKE_SOURCE_DIR}/doc/example_datum_gateway_config.json)
 install(FILES ${PREGEN_DOC} DESTINATION ${CMAKE_INSTALL_DOCDIR})

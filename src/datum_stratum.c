@@ -10,7 +10,7 @@
  *
  * ---
  *
- * Copyright (c) 2024 Bitcoin Ocean, LLC & Jason Hughes
+ * Copyright (c) 2024-2025 Bitcoin Ocean, LLC & Jason Hughes
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -910,7 +910,8 @@ const char *datum_stratum_mod_username(const char *username_s, char * const user
 	
 	memcpy(username_buf, range->addr, range->addr_len);
 	size_t len = tilde - period;
-	if (len >= username_buf_sz) len = username_buf_sz - 1;
+	const size_t max_len = username_buf_sz - range->addr_len - 1;
+	if (len > max_len) len = max_len;
 	memcpy(&username_buf[range->addr_len], period, len);
 	username_buf[range->addr_len + len] = '\0';
 	return username_buf;
